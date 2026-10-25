@@ -47,9 +47,6 @@ fieldset{border:0;padding:0;margin:0 0 14px}legend{font-weight:600;padding:0}
 .btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
 .lk{text-align:center;margin:16px 0 0;font-size:15px}.lk a{color:var(--ink);font-weight:600}
 .bar{height:6px;border-radius:3px;background:var(--line);margin-top:8px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--err);transition:width .2s}
-.codes{list-style:none;counter-reset:c;margin:0 0 12px;padding:0;display:grid;gap:6px}
-.codes li{counter-increment:c;font:600 17px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.5px;padding:10px 12px;border:1.5px dashed var(--line);border-radius:8px;user-select:all}
-.codes li::before{content:counter(c) ". ";color:var(--mut);font-weight:400}
 main.wide{max-width:980px}
 .nav{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:10px 0;background:color-mix(in srgb,var(--bg) 85%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .nav .brand{margin:0}.nav .logo{width:40px;height:40px}.nav .wm{font-size:22px}
@@ -134,7 +131,12 @@ h1,h2,.wm,.btn,.av,summary,.steps b,.tracks b,.toast,.chip,.lvup,.seg button,.la
 'use strict';
 // ===== ตั้งค่า (ค่า publishable key เปิดเผยได้ตามหลักของ Supabase) =====
 const CFG={url:'https://xbsoopydnycvbzpjshbg.supabase.co',key:'sb_publishable_Sn9b94qaaFmk91CBZC_X8Q_fSciGmg9',site:'0x4AAAAAAFlCsg99TKfH8_Ax'};
-const DOCV={terms:'1.0',privacy:'1.0',community:'1.0',pw_ack:'1.0'};
+// pw_ack 1.1: ข้อความรับทราบเปลี่ยนจาก "รหัสกู้คืน" เป็น "PIN และคำตอบ" (D-43) จึงเปลี่ยนเวอร์ชันของ consent
+const DOCV={terms:'1.0',privacy:'1.0',community:'1.0',pw_ack:'1.1'};
+// PIN กู้บัญชี (D-43): ฝั่งเซิร์ฟเวอร์อ่านความยาวจาก game_config recovery.pin_length (ตอนนี้ 6) ถ้าแก้ค่านั้น ต้องแก้ตัวเลขนี้ด้วย
+const PINLEN=6;
+// คำถามกู้บัญชี: ลำดับที่ = question_id ในฐานข้อมูล (1-6) ห้ามสลับหรือแทรกลำดับ แก้ได้เฉพาะถ้อยคำ
+const QUESTIONS=['ชื่อสัตว์เลี้ยงตัวแรกของคุณ','ชื่อโรงเรียนประถมของคุณ','ชื่ออาหารจานโปรดที่สุดของคุณ','ชื่อเล่นที่เพื่อนสมัยเด็กเรียกคุณ','ชื่ออำเภอหรือเมืองที่คุณเกิด','ชื่อการ์ตูนหรือเกมเรื่องแรกที่คุณชอบ'];
 // ข้อความทั้งหมดอยู่ที่นี่ (ภาษาไทย) เพิ่ม en ภายหลังได้
 const T={
  loginFail:'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง หรือลองมากเกินไป กรุณารอแล้วลองใหม่',
@@ -144,12 +146,16 @@ const T={
   invite_invalid:'รหัสนี้ใช้ไม่ได้',username_unavailable:'ชื่อผู้ใช้นี้ใช้ไม่ได้ ลองชื่ออื่น',
   password_too_short:'รหัสผ่านต้องยาว 10 ตัวขึ้นไป',password_too_long:'รหัสผ่านยาวเกินไป',password_too_common:'รหัสผ่านนี้เดาง่ายเกินไป เปลี่ยนเป็นอย่างอื่น',
   consent_required:'ต้องยอมรับเงื่อนไขทั้ง 4 ข้อก่อน',rate_limited:'ลองมากเกินไป กรุณารอสักครู่แล้วลองใหม่',
-  invalid_or_limited:'ข้อมูลไม่ถูกต้อง หรือลองมากเกินไป กรุณารอแล้วลองใหม่',signup_closed:'ขณะนี้ยังไม่เปิดรับสมัคร'},
+  invalid_or_limited:'ข้อมูลไม่ถูกต้อง หรือลองมากเกินไป กรุณารอแล้วลองใหม่',signup_closed:'ขณะนี้ยังไม่เปิดรับสมัคร',
+  pin_invalid:'PIN ต้องเป็นตัวเลข '+PINLEN+' หลัก และห้ามเรียงกันหรือซ้ำกันง่ายเกินไป เช่น 123456 หรือ 111111',
+  question_invalid:'กรุณาเลือกคำถามกู้บัญชี',answer_invalid:'คำตอบต้องยาว 3-60 ตัวอักษร (ไม่นับช่องว่าง)',
+  reset_failed:'เปลี่ยนรหัสผ่านไม่สำเร็จ กรุณาลองใหม่อีกครั้ง',server_error:'ระบบขัดข้องชั่วคราว กรุณาลองใหม่อีกครั้ง',signup_failed:'สร้างบัญชีไม่สำเร็จ กรุณาลองใหม่อีกครั้ง'},
  strength:['','อ่อนมาก','อ่อน','พอใช้','ดี','แข็งแรง']
 };
 const MONTHS=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
 const INVITE_RE=/^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{8}$/;
 const BACK_TO_STEP1=['invite_invalid','under_13','consent_required','invalid_birth_month'];
+const BACK_TO_STEP2=['username_unavailable','invalid_username','invalid_display_name','password_too_short','password_too_long','password_too_common'];
 
 // ===== ตัวช่วย =====
 const $=(s,r=document)=>r.querySelector(s);
@@ -181,7 +187,19 @@ function dropTS(){
 function freshTS(){tok=null;if(window.turnstile&&wid!==null){try{turnstile.reset(wid)}catch(_){}}onTok()}
 
 // ===== สถานะในหน่วยความจำเท่านั้น (ไม่เก็บลง storage) =====
-let sess=null,codes=null,prefill='',io=null;
+let sess=null,flash=null,io=null; // flash = {u,msg} ข้อความและชื่อผู้ใช้ที่ส่งต่อให้หน้าล็อกอินครั้งเดียว
+// เปลี่ยนหน้าโดยไม่ให้เราเตอร์ทำงานซ้ำสองรอบ (การตั้ง hash ทำให้เกิด hashchange อยู่แล้ว)
+const nav=h=>{if(location.hash===h)route();else location.hash=h};
+// PIN ที่ผิดง่ายเกินไป (สะท้อนกฎ weakPin ฝั่งเซิร์ฟเวอร์ เพื่อแจ้งก่อนส่ง ไม่ใช่ตัวตัดสิน)
+function weakPin(p){
+  if(/^(\d)\1+$/.test(p))return true;
+  const d=[...p].map(Number);
+  if(d.every((x,i)=>i===0||x-d[i-1]===1)||d.every((x,i)=>i===0||d[i-1]-x===1))return true;
+  return /^(\d\d)\1+$/.test(p)||/^(\d\d\d)\1$/.test(p);
+}
+const pinOk=p=>new RegExp('^\\d{'+PINLEN+'}$').test(p)&&!weakPin(p);
+const ansLen=a=>[...a.normalize('NFC').toLowerCase().replace(/\s+/g,'')].length;
+const qOpts=()=>QUESTIONS.map((q,i)=>`<option value="${i+1}">${q}</option>`).join('');
 
 // ===== หน้าแรก =====
 const RANKS=[['มือใหม่','1-9','#B98255',[0,0]],['ผู้ฝึกหัด','10-19','#9FB0C8',[9,3]],['นักผจญภัย','20-29','#27E1C1',[44,16]],['นักรบ','30-39','#5CF2A8',[110,41]],['อัศวิน','40-49','#4DA3FF',[211,79]],['จอมยุทธ์','50-59','#A66BFF',[347,130]],['ผู้พิทักษ์','60-69','#FF4FA3',[522,196]],['ปรมาจารย์','70-79','#FF8A3D',[739,277]],['ตำนาน','80-89','#FFD43B',[993,373]],['ราชัน','90-100','linear-gradient(90deg,#FFD43B,#FF4FA3,#27E1C1)',[1294,485]]];
@@ -189,7 +207,7 @@ const FAQ=[
  ['ต้องมีรหัสเชิญไหม','ตอนนี้ต้องมี เพราะเปิดเป็นรอบเพื่อดูแลชุมชนให้ทั่วถึง ได้รหัสจากผู้ดูแลหรือเพื่อนที่ใช้อยู่แล้ว'],
  ['ใช้ฟรีหรือเปล่า','ฟรี ยศและ XP ได้จากการเล่นเท่านั้น เงินซื้อยศ XP หรืออันดับไม่ได้'],
  ['อายุเท่าไรถึงสมัครได้','ตั้งแต่ 13 ปีขึ้นไป ผู้ใช้ 13-17 ปีได้รับการป้องกันเป็นค่าเริ่มต้น เช่น โปรไฟล์ส่วนตัวและจำกัดผู้ที่ทักได้'],
- ['ลืมรหัสผ่านทำอย่างไร','ตอนสมัครคุณจะได้รหัสกู้คืน 10 ตัว ใช้กู้ได้รหัสละครั้ง ไม่มีใครรีเซ็ตให้ได้ รวมถึงแอดมิน ดังนั้นเก็บรหัสไว้ที่ปลอดภัย']
+ ['ลืมรหัสผ่านทำอย่างไร','ตอนสมัครคุณจะตั้ง PIN ตัวเลข '+PINLEN+' หลักและคำตอบของคำถามกู้บัญชีไว้ ใช้สองอย่างนี้กู้รหัสผ่านได้ ไม่มีใครรีเซ็ตให้ได้ รวมถึงแอดมิน ดังนั้นจำไว้ให้ดี']
 ];
 function landing(){
   document.querySelector('main').classList.add('wide');
@@ -253,7 +271,7 @@ function login(){
   </form></div>
   <p class="lk"><a href="#/forgot">ลืมรหัสผ่าน</a> &nbsp;|&nbsp; <a href="#/signup">สมัครสมาชิก</a></p>`;
   const u=$('#u'),p=$('#p'),go=$('#go'),m=$('#m');let busy=false;
-  if(prefill){u.value=prefill;prefill='';say(m,'สมัครสำเร็จ เข้าสู่ระบบด้วยรหัสผ่านที่ตั้งไว้',true)}
+  if(flash){u.value=flash.u;say(m,flash.msg,true);flash=null}
   const upd=()=>{go.disabled=busy||!tok||!u.value||!p.value};
   u.oninput=p.oninput=upd;mountTS($('#ts'),upd);
   $('#f').onsubmit=async e=>{
@@ -281,7 +299,7 @@ function home(){
   $('#lo').onclick=async()=>{
     const t=sess&&sess.access_token;sess=null;
     try{if(t)await post('/auth/v1/logout',{},t)}catch(_){}
-    location.hash='#/login';route();
+    nav('#/login');
   };
 }
 
@@ -291,6 +309,7 @@ function strength(pw){
   if(/[a-z]/.test(pw)&&/[A-Z]/.test(pw))s++;if(/\d/.test(pw))s++;if(/[^A-Za-z0-9]/.test(pw))s++;
   return pw.length<10?Math.min(s,1):Math.max(s,2);
 }
+// สมัคร 3 ขั้น: (1) รหัสเชิญ อายุ ข้อตกลง (2) ชื่อและรหัสผ่าน (3) PIN และคำถามกู้บัญชี (D-43) แล้วสร้างบัญชี
 function signup(invite){
   const yr=new Date().getFullYear();
   app.innerHTML=brand+`<div class="card"><h1>สมัครสมาชิก</h1>
@@ -304,7 +323,7 @@ function signup(invite){
     <label class="ck"><input type="checkbox" class="cc"> ยอมรับข้อกำหนดการใช้งาน</label>
     <label class="ck"><input type="checkbox" class="cc"> ยอมรับนโยบายความเป็นส่วนตัว</label>
     <label class="ck"><input type="checkbox" class="cc"> ยอมรับกฎชุมชน</label>
-    <label class="ck"><input type="checkbox" class="cc"> รับทราบว่าถ้าทำรหัสผ่านและรหัสกู้คืนหายทั้งหมด จะกู้บัญชีไม่ได้ และไม่มีใครรีเซ็ตให้ได้ รวมถึงแอดมิน</label>
+    <label class="ck"><input type="checkbox" class="cc"> รับทราบว่าถ้าลืมรหัสผ่าน และจำ PIN หรือคำตอบกู้บัญชีไม่ได้ จะกู้บัญชีไม่ได้ และไม่มีใครรีเซ็ตให้ได้ รวมถึงแอดมิน</label>
     <p class="msg" id="m1" role="alert"></p>
     <button type="button" class="btn pri" id="nx">ต่อไป</button>
    </div>
@@ -312,17 +331,28 @@ function signup(invite){
     <label>ชื่อผู้ใช้<input type="text" id="un" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="20"><span class="hint">a-z 0-9 และ _ ยาว 3-20 ตัว</span></label>
     <label>ชื่อแสดง<input type="text" id="dn" autocomplete="nickname" maxlength="24"></label>
     <label>รหัสผ่าน<input type="password" id="pw" autocomplete="new-password" maxlength="72"><div class="bar"><i id="bi"></i></div><span class="hint" id="bl"></span></label>
-    <p class="hint">จำรหัสนี้ไว้ให้ดี และเก็บรหัสกู้คืน 10 ตัวที่จะได้หลังสมัครไว้กับตัว</p>
-    <div id="ts"></div><p class="msg" id="m2" role="alert"></p>
+    <p class="hint">จำรหัสผ่านนี้ไว้ให้ดี ขั้นต่อไปจะตั้ง PIN และคำถามไว้ใช้กู้บัญชีเมื่อลืมรหัสผ่าน</p>
+    <p class="msg" id="m2" role="alert"></p>
+    <button type="button" class="btn pri" id="nx2">ต่อไป</button>
+    <button type="button" class="btn" id="bk2">ย้อนกลับ</button>
+   </div>
+   <div id="s3" hidden>
+    <h2 style="font-size:18px;margin:0 0 6px">ตั้งค่ากู้บัญชี</h2>
+    <p class="hint">ถ้าลืมรหัสผ่าน จะกู้บัญชีได้ด้วย PIN และคำตอบของคำถามนี้เท่านั้น ไม่มีใครช่วยรีเซ็ตให้ได้ รวมถึงแอดมิน จึงควรเป็นสิ่งที่คุณจำได้แน่ๆ และคนอื่นเดายาก</p>
+    <label>PIN ตัวเลข ${PINLEN} หลัก<input type="password" id="pn" name="rpin" inputmode="numeric" autocomplete="off" maxlength="${PINLEN}"></label>
+    <label>ยืนยัน PIN อีกครั้ง<input type="password" id="pn2" name="rpin2" inputmode="numeric" autocomplete="off" maxlength="${PINLEN}"></label>
+    <label>คำถามกู้บัญชี<select id="rq"><option value="">เลือกคำถาม</option>${qOpts()}</select></label>
+    <label>คำตอบ<input type="text" id="ra" name="ranswer" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="60"><span class="hint">ตัวพิมพ์เล็กใหญ่และช่องว่างไม่มีผล แต่ต้องสะกดเหมือนเดิมทุกครั้ง</span></label>
+    <div id="ts"></div><p class="msg" id="m3" role="alert"></p>
     <button class="btn pri" id="go" disabled>สร้างบัญชี</button>
-    <button type="button" class="btn" id="bk">ย้อนกลับ</button>
+    <button type="button" class="btn" id="bk3">ย้อนกลับ</button>
    </div>
   </form></div>
   <p class="lk">มีบัญชีแล้ว <a href="#/login">เข้าสู่ระบบ</a></p>`;
-  const iv=$('#iv'),m1=$('#m1'),m2=$('#m2'),s1=$('#s1'),s2=$('#s2'),go=$('#go');let busy=false,tsOn=false;
+  const iv=$('#iv'),m1=$('#m1'),m2=$('#m2'),m3=$('#m3'),go=$('#go');let busy=false,tsOn=false;
   if(invite)iv.value=invite.slice(0,8);
-  const upd=()=>{go.disabled=busy||!tok||!$('#un').value||!$('#dn').value||!$('#pw').value};
-  const step=n=>{s1.hidden=n!==1;s2.hidden=n!==2;if(n===2&&!tsOn){tsOn=true;mountTS($('#ts'),upd)}};
+  const upd=()=>{go.disabled=busy||!tok||!$('#pn').value||!$('#pn2').value||!$('#rq').value||!$('#ra').value};
+  const step=n=>{[1,2,3].forEach(k=>{$('#s'+k).hidden=k!==n});if(n===3&&!tsOn){tsOn=true;mountTS($('#ts'),upd)}};
   $('#nx').onclick=()=>{
     const code=iv.value.trim().toUpperCase(),mo=+$('#bm').value,y=+$('#by').value;
     if(!INVITE_RE.test(code))return say(m1,T.err.invite_invalid);
@@ -331,103 +361,116 @@ function signup(invite){
     if([...document.querySelectorAll('.cc')].some(c=>!c.checked))return say(m1,T.err.consent_required);
     say(m1,'');step(2);$('#un').focus();
   };
-  $('#bk').onclick=()=>step(1);
-  $('#un').oninput=$('#dn').oninput=upd;
-  $('#pw').oninput=e=>{
-    const s=strength(e.target.value),b=$('#bi');
-    b.style.width=e.target.value?s*20+'%':'0';b.style.background=s>=4?'var(--ok)':s>=3?'var(--acc)':'var(--err)';
-    $('#bl').textContent=e.target.value?T.strength[s]:'';upd();
-  };
-  $('#f').onsubmit=async e=>{
-    e.preventDefault();if(busy||go.disabled)return;
+  $('#nx2').onclick=()=>{
     const un=$('#un').value.trim().toLowerCase(),dn=$('#dn').value.trim(),pw=$('#pw').value;
     if(!/^[a-z0-9_]{3,20}$/.test(un))return say(m2,T.err.invalid_username);
     const dl=[...dn].length;if(dl<2||dl>24)return say(m2,T.err.invalid_display_name);
     if(pw.length<10)return say(m2,T.err.password_too_short);
-    busy=true;upd();say(m2,'');
+    say(m2,'');step(3);$('#pn').focus();
+  };
+  $('#bk2').onclick=()=>step(1);
+  $('#bk3').onclick=()=>step(2);
+  ['#pn','#pn2','#rq','#ra'].forEach(i=>{$(i).oninput=upd;$(i).onchange=upd});
+  $('#pn').oninput=$('#pn2').oninput=e=>{e.target.value=e.target.value.replace(/\D/g,'');upd()};
+  $('#pw').oninput=e=>{
+    const s=strength(e.target.value),b=$('#bi');
+    b.style.width=e.target.value?s*20+'%':'0';b.style.background=s>=4?'var(--ok)':s>=3?'var(--acc)':'var(--err)';
+    $('#bl').textContent=e.target.value?T.strength[s]:'';
+  };
+  $('#f').onsubmit=async e=>{
+    e.preventDefault();if(busy||go.disabled)return;
+    const un=$('#un').value.trim().toLowerCase(),dn=$('#dn').value.trim(),pw=$('#pw').value;
+    const pin=$('#pn').value.trim(),ans=$('#ra').value,q=+$('#rq').value;
+    if(!pinOk(pin))return say(m3,T.err.pin_invalid);
+    if(pin!==$('#pn2').value.trim())return say(m3,'PIN ทั้งสองช่องไม่ตรงกัน');
+    if(!(q>=1&&q<=QUESTIONS.length))return say(m3,T.err.question_invalid);
+    const al=ansLen(ans);if(al<3||al>60)return say(m3,T.err.answer_invalid);
+    busy=true;upd();say(m3,'');
     const bm=$('#by').value+'-'+String($('#bm').value).padStart(2,'0');
     let done=false;
     try{
       const r=await post('/functions/v1/signup',{turnstile_token:tok,birth_month:bm,username:un,display_name:dn,
-        invite_code:iv.value.trim().toUpperCase(),password:pw,consent:DOCV});
-      if(r.ok&&r.j.ok&&Array.isArray(r.j.recovery_codes)){done=true;showCodes(r.j.recovery_codes,un)}
-      else{
+        invite_code:iv.value.trim().toUpperCase(),password:pw,consent:DOCV,
+        recovery_pin:pin,recovery_question:q,recovery_answer:ans});
+      if(r.ok&&r.j.ok){
+        done=true;
+        ['#pn','#pn2','#ra','#pw'].forEach(i=>{$(i).value=''}); // ล้างข้อมูลลับออกจากฟอร์ม
+        flash={u:un,msg:'สมัครสำเร็จ เข้าสู่ระบบด้วยรหัสผ่านที่ตั้งไว้ และจำ PIN กับคำตอบกู้บัญชีไว้ให้ดี'};
+        nav('#/login');
+      }else{
         const k=r.j&&r.j.error;
         if(BACK_TO_STEP1.includes(k)){step(1);say(m1,T.err[k])}
-        else say(m2,T.err[k]||T.generic);
+        else if(BACK_TO_STEP2.includes(k)){step(2);say(m2,T.err[k])}
+        else say(m3,T.err[k]||T.generic);
       }
-    }catch(_){say(m2,T.generic)}
+    }catch(_){say(m3,T.generic)}
     busy=false;if(!done){freshTS()}
   };
 }
 
-// ===== หน้า: รหัสกู้คืน (แสดงครั้งเดียว อยู่ในหน่วยความจำเท่านั้น) =====
-function showCodes(list,username){
-  dropTS();codes=list.slice();
-  app.innerHTML=brand+`<div class="card"><h1>เก็บรหัสกู้คืนของคุณ</h1>
-  <p>รหัสชุดนี้ใช้กู้บัญชีเมื่อลืมรหัสผ่าน ใช้ได้รหัสละ 1 ครั้ง และแสดงให้เห็นครั้งเดียวเท่านั้น ไม่มีใครกู้แทนได้ รวมถึงแอดมิน <b>ห้ามรีเฟรชหน้านี้</b></p>
-  <ol class="codes" id="cl"></ol>
-  <div class="row"><button type="button" class="btn" id="cp">คัดลอกทั้งชุด</button><button type="button" class="btn" id="sv">บันทึกเป็นไฟล์</button></div>
-  <p class="msg ok" id="m" role="status"></p>
-  <label class="ck"><input type="checkbox" id="ok"> ฉันบันทึกรหัสไว้ที่ปลอดภัยแล้ว</label>
-  <button class="btn pri" id="nx" disabled>ไปต่อ</button></div>`;
-  const ol=$('#cl');codes.forEach(c=>{const li=document.createElement('li');li.textContent=c;ol.appendChild(li)});
-  let saved=false;const m=$('#m'),nx=$('#nx'),ok=$('#ok');
-  const upd=()=>{nx.disabled=!(saved&&ok.checked)};
-  ok.onchange=upd;
-  $('#cp').onclick=async()=>{
-    const txt=codes.join('\n');
-    try{await navigator.clipboard.writeText(txt)}catch(_){
-      const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();
-      try{document.execCommand('copy')}catch(_){}ta.remove();
-    }
-    saved=true;say(m,'คัดลอกแล้ว นำไปวางเก็บไว้ในที่ปลอดภัย',true);upd();
-  };
-  $('#sv').onclick=()=>{
-    const body='Heroroom - รหัสกู้คืน\nชื่อผู้ใช้: '+username+'\nแต่ละรหัสใช้ได้ครั้งเดียว เก็บไว้ในที่ปลอดภัย\n\n'+codes.join('\n')+'\n';
-    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([body],{type:'text/plain;charset=utf-8'}));
-    a.download='heroroom-recovery-codes.txt';document.body.appendChild(a);a.click();a.remove();
-    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-    saved=true;say(m,'บันทึกไฟล์แล้ว เก็บไว้ในที่ปลอดภัย',true);upd();
-  };
-  window.onbeforeunload=e=>{e.preventDefault();e.returnValue=''};
-  nx.onclick=()=>{
-    window.onbeforeunload=null;codes.length=0;codes=null;ol.textContent='';
-    prefill=username;location.hash='#/login';route();
-  };
-}
-
-// ===== หน้า: ลืมรหัสผ่าน (กู้ด้วยรหัสกู้คืน 1 ตัว) =====
+// ===== หน้า: ลืมรหัสผ่าน (กู้ด้วย PIN + คำตอบของคำถามกู้บัญชี, D-43) =====
+// ขั้น 1: ส่งชื่อผู้ใช้เพื่อขอคำถาม (บัญชีที่ไม่มีจริงได้คำถามสุ่มที่นิ่ง แยกไม่ออก)  ขั้น 2: ส่ง PIN คำตอบ และรหัสผ่านใหม่
+// Turnstile token ใช้ได้ครั้งเดียว จึงต้องผ่านใหม่ทั้งสองขั้น
 function forgot(){
   app.innerHTML=brand+`<div class="card"><h1>กู้รหัสผ่าน</h1>
-  <p class="hint">ใช้รหัสกู้คืน 1 ตัวจากชุดที่ได้ตอนสมัคร รหัสแต่ละตัวใช้ได้ครั้งเดียว</p>
+  <p class="hint" id="hn">กรอกชื่อผู้ใช้ แล้วตอบคำถามกู้บัญชีที่ตั้งไว้ตอนสมัคร พร้อม PIN ${PINLEN} หลัก</p>
   <form id="f" novalidate>
    <label>ชื่อผู้ใช้<input type="text" id="u" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="20"></label>
-   <label>รหัสกู้คืน<input type="text" id="rc" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="24" placeholder="XXXX-XXXX-XXXX-XXXX"></label>
-   <label>รหัสผ่านใหม่<input type="password" id="n1" autocomplete="new-password" maxlength="72"></label>
-   <label>ยืนยันรหัสผ่านใหม่<input type="password" id="n2" autocomplete="new-password" maxlength="72"></label>
+   <div id="b" hidden>
+    <p><b id="qt"></b></p>
+    <label>คำตอบ<input type="text" id="ra" name="ranswer" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="60"></label>
+    <label>PIN ${PINLEN} หลัก<input type="password" id="pn" name="rpin" inputmode="numeric" autocomplete="off" maxlength="${PINLEN}"></label>
+    <label>รหัสผ่านใหม่<input type="password" id="n1" autocomplete="new-password" maxlength="72"></label>
+    <label>ยืนยันรหัสผ่านใหม่<input type="password" id="n2" autocomplete="new-password" maxlength="72"></label>
+   </div>
    <div id="ts"></div><p class="msg" id="m" role="alert"></p>
-   <button class="btn pri" id="go" disabled>เปลี่ยนรหัสผ่าน</button>
+   <button class="btn pri" id="go" disabled>ต่อไป</button>
+   <button type="button" class="btn" id="bk" hidden>เปลี่ยนชื่อผู้ใช้</button>
   </form></div>
   <p class="lk"><a href="#/login">กลับไปเข้าสู่ระบบ</a></p>`;
-  const go=$('#go'),m=$('#m');let busy=false;
-  const ids=['#u','#rc','#n1','#n2'];
-  const upd=()=>{go.disabled=busy||!tok||ids.some(i=>!$(i).value)};
-  ids.forEach(i=>$(i).oninput=upd);mountTS($('#ts'),upd);
+  const go=$('#go'),m=$('#m'),u=$('#u');let busy=false,stage=1;
+  const ids2=['#ra','#pn','#n1','#n2'];
+  const upd=()=>{go.disabled=busy||!tok||!u.value||(stage===2&&ids2.some(i=>!$(i).value))};
+  u.oninput=upd;ids2.forEach(i=>$(i).oninput=upd);
+  $('#pn').oninput=e=>{e.target.value=e.target.value.replace(/\D/g,'');upd()};
+  mountTS($('#ts'),upd);
+  $('#bk').onclick=()=>{
+    stage=1;$('#b').hidden=true;$('#bk').hidden=true;u.readOnly=false;go.textContent='ต่อไป';
+    ids2.forEach(i=>{$(i).value=''});say(m,'');freshTS();upd();
+  };
   $('#f').onsubmit=async e=>{
     e.preventDefault();if(busy||go.disabled)return;
-    if($('#n1').value!==$('#n2').value)return say(m,'รหัสผ่านใหม่ทั้งสองช่องไม่ตรงกัน');
+    const un=u.value.trim().toLowerCase();
+    if(!/^[a-z0-9_]{3,20}$/.test(un))return say(m,T.err.invalid_or_limited);
+    if(stage===1){
+      busy=true;upd();say(m,'');
+      try{
+        const r=await post('/functions/v1/reset-with-pin',{turnstile_token:tok,username:un,action:'question'});
+        const q=r.j&&r.j.question;
+        if(r.ok&&Number.isInteger(q)&&q>=1&&q<=QUESTIONS.length){
+          stage=2;u.readOnly=true;$('#qt').textContent=QUESTIONS[q-1];$('#b').hidden=false;$('#bk').hidden=false;
+          go.textContent='เปลี่ยนรหัสผ่าน';$('#ra').focus();
+        }else say(m,T.err[r.j&&r.j.error]||T.generic);
+      }catch(_){say(m,T.generic)}
+      busy=false;freshTS();upd();return;
+    }
+    // ขั้น 2: ตรวจในเครื่องก่อน (ไม่เสียโอกาสลองและไม่ใช้ token)
+    const pin=$('#pn').value.trim(),ans=$('#ra').value,n1=$('#n1').value;
+    if(!new RegExp('^\\d{'+PINLEN+'}$').test(pin))return say(m,'PIN ต้องเป็นตัวเลข '+PINLEN+' หลัก');
+    const al=ansLen(ans);if(al<3||al>60)return say(m,T.err.answer_invalid);
+    if(n1.length<10)return say(m,T.err.password_too_short);
+    if(n1!==$('#n2').value)return say(m,'รหัสผ่านใหม่ทั้งสองช่องไม่ตรงกัน');
     busy=true;upd();say(m,'');let ok=false;
     try{
-      const r=await post('/functions/v1/reset-with-code',{turnstile_token:tok,username:$('#u').value.trim().toLowerCase(),
-        recovery_code:$('#rc').value.trim(),new_password:$('#n1').value});
+      const r=await post('/functions/v1/reset-with-pin',{turnstile_token:tok,username:un,recovery_pin:pin,recovery_answer:ans,new_password:n1});
       if(r.ok&&r.j.ok){
-        ok=true;prefill=$('#u').value.trim().toLowerCase();
-        say(m,'เปลี่ยนรหัสผ่านแล้ว เหลือรหัสกู้คืน '+r.j.remaining+' ตัว เข้าสู่ระบบด้วยรหัสผ่านใหม่ได้เลย',true);
-        ids.forEach(i=>$(i).value='');setTimeout(()=>{location.hash='#/login'},2500);
+        ok=true;const hh=Number(r.j.hold_hours)||0;
+        ids2.forEach(i=>{$(i).value=''});
+        flash={u:un,msg:'เปลี่ยนรหัสผ่านแล้ว เข้าสู่ระบบด้วยรหัสผ่านใหม่ได้เลย'+(hh>0?' เพื่อความปลอดภัย บัญชีจะถูกพักการขาย โอน และใช้อัญมณี '+hh+' ชั่วโมง':'')};
+        nav('#/login');
       }else say(m,T.err[r.j&&r.j.error]||T.generic);
     }catch(_){say(m,T.generic)}
-    busy=false;if(!ok)freshTS();upd();
+    busy=false;if(!ok){$('#pn').value='';freshTS()}upd();
   };
 }
 
@@ -443,7 +486,7 @@ function route(){
   if(r==='login')return login();
   return landing();
 }
-addEventListener('hashchange',()=>{if(!codes)route()});
+addEventListener('hashchange',route);
 route();
 </script>
 </body>

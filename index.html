@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Heroroom</title>
+<meta name="theme-color" content="#120B3A">
+<meta name="description" content="Heroroom โซเชียลที่ทุกโพสต์ ไลก์ และคอมเมนต์พาคุณเลเวลอัป ยศได้จากการเล่นเท่านั้น">
+<meta property="og:type" content="website"><meta property="og:title" content="Heroroom - ทุกโพสต์ คือก้าวหนึ่งของการผจญภัย">
+<meta property="og:description" content="โซเชียลที่ทุกโพสต์ ไลก์ และคอมเมนต์พาคุณเลเวลอัป ยศซื้อไม่ได้"><meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;700;800&family=Noto+Sans+Thai:wght@400;600;700&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231B1250'/%3E%3Crect x='16' y='14' width='16' height='72' fill='%23fff'/%3E%3Crect x='68' y='14' width='16' height='72' fill='%23fff'/%3E%3Crect x='32' y='42' width='36' height='10' fill='%23fff'/%3E%3Cpath d='M45 52l21-6v38l-21-4z' fill='%23FFD43B'/%3E%3C/svg%3E">
+<style>
+/* สีทั้งหมดแก้ที่นี่ที่เดียว */
+/* สีทั้งหมดแก้ที่นี่ที่เดียว: ธีมมืดเป็นค่าเริ่มต้น ธีมสว่างตามระบบ */
+:root{color-scheme:dark;--bg:#120B3A;--ink:#F6F3FF;--card:#1D1559;--line:#4A3DA8;--mut:#BDB4F2;
+--acc:#FFD43B;--accink:#1B1250;--accsh:#C28A00;--a2:#27E1C1;--a3:#FF4FA3;--err:#FF9AAE;--ok:#5CF2A8;
+--g1:#4B2FD0;--g2:#7A1F8F;--glow:0 0 26px rgba(110,80,255,.28)}
+@media (prefers-color-scheme:light){:root{color-scheme:light;--bg:#F1EDFF;--ink:#1B1250;--card:#fff;--line:#CFC5FF;--mut:#5B4FA8;
+--err:#C2183B;--ok:#127A47;--g1:#D8CCFF;--g2:#FFE3F1;--glow:0 0 0 transparent}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%;touch-action:manipulation}
+a,button,input,select,summary,label{touch-action:manipulation}
+html,body{margin:0}
+body{background-color:var(--bg);background-image:radial-gradient(700px 420px at 88% -4%,var(--g1),transparent 70%),radial-gradient(560px 380px at -12% 34%,var(--g2),transparent 70%);background-repeat:no-repeat;color:var(--ink);font:16px/1.55 "Noto Sans Thai","Sarabun",system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;padding:max(20px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom));display:flex;justify-content:center}
+main{width:100%;max-width:420px}
+.brand{display:flex;align-items:center;gap:12px;margin:8px 0 20px;color:inherit;text-decoration:none}
+.logo{width:64px;height:64px;flex:none}
+.wm{font-size:30px;letter-spacing:-.5px;line-height:1}.wm b{font-weight:800}
+.card{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:22px 18px;box-shadow:0 6px 0 rgba(0,0,0,.18),var(--glow)}
+h1{font-size:22px;line-height:1.3;margin:0 0 14px}
+p{margin:0 0 12px}
+label{display:block;font-weight:600;margin:0 0 14px}
+input[type=text],input[type=password],select{display:block;width:100%;min-height:48px;margin-top:6px;padding:10px 12px;font:inherit;font-weight:400;color:var(--ink);background:transparent;border:1.5px solid var(--line);border-radius:10px}
+input:focus,select:focus,button:focus-visible,a:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+fieldset{border:0;padding:0;margin:0 0 14px}legend{font-weight:600;padding:0}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.ck{display:flex;gap:10px;align-items:flex-start;font-weight:400;margin-bottom:10px}
+.ck input{width:22px;height:22px;margin:2px 0 0;flex:none;accent-color:var(--acc)}
+.hint{font-size:14px;color:var(--mut);font-weight:400}
+.msg{min-height:22px;font-size:15px;color:var(--err);font-weight:600}.msg.ok{color:var(--ok)}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:52px;margin-top:10px;font:inherit;font-weight:700;border-radius:12px;border:2px solid var(--ink);cursor:pointer;background:transparent;color:var(--ink);text-decoration:none;box-shadow:0 4px 0 var(--line);transition:transform .08s,box-shadow .08s}
+.btn:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:var(--accink);box-shadow:0 4px 0 var(--accsh)}
+.btn.pri:active:not(:disabled){box-shadow:0 1px 0 var(--accsh)}
+.btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.lk{text-align:center;margin:16px 0 0;font-size:15px}.lk a{color:var(--ink);font-weight:600}
+.bar{height:6px;border-radius:3px;background:var(--line);margin-top:8px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--err);transition:width .2s}
+.codes{list-style:none;counter-reset:c;margin:0 0 12px;padding:0;display:grid;gap:6px}
+.codes li{counter-increment:c;font:600 17px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.5px;padding:10px 12px;border:1.5px dashed var(--line);border-radius:8px;user-select:all}
+.codes li::before{content:counter(c) ". ";color:var(--mut);font-weight:400}
+main.wide{max-width:980px}
+.nav{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:10px 0;background:color-mix(in srgb,var(--bg) 85%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.nav .brand{margin:0}.nav .logo{width:40px;height:40px}.nav .wm{font-size:22px}
+.nav .btn{width:auto;margin:0;min-height:42px;padding:0 18px}
+.hero{display:grid;gap:30px;padding:14px 0 36px}
+.big{width:96px;height:96px;display:block;margin:0 0 4px -4px}
+.pl{fill:var(--ink)}
+.door{fill:var(--acc);transform-origin:46px 70px;animation:open .9s .25s cubic-bezier(.2,.8,.2,1) both}
+@keyframes open{from{transform:scaleX(.06)}}
+.wm.xl{font-size:40px;margin-bottom:16px}
+.tag{font-size:32px;line-height:1.2;letter-spacing:-.4px;margin:0 0 12px}
+.sub{font-size:17px;color:var(--mut);margin:0 0 18px}
+.hero .btn{max-width:340px}
+.phone{position:relative;background:var(--card);border:2px solid var(--line);border-radius:26px;padding:18px;max-width:340px;width:100%;justify-self:center;box-shadow:0 8px 0 rgba(0,0,0,.22),var(--glow)}
+.pf{display:flex;gap:12px;align-items:center}
+.av{width:46px;height:46px;border-radius:50%;background:var(--g1);color:var(--ink);display:grid;place-items:center;font-weight:800;flex:none}
+.pf b{display:block}.pf small{color:var(--mut)}
+.xp{height:12px;border-radius:6px;background:var(--line);margin:14px 0 6px;overflow:hidden}
+.xp i{display:block;height:100%;width:66%;background:var(--a2);animation:fill 1.4s .5s ease-out both}
+@keyframes fill{from{width:8%}}
+.xpl{display:flex;justify-content:space-between;font-size:13px;color:var(--mut)}
+.post{border-top:1.5px solid var(--line);margin-top:14px;padding-top:12px}.post p{margin:0 0 6px}.post small{color:var(--mut)}
+.toast{position:absolute;right:-6px;top:-14px;background:var(--a2);color:#1B1250;font-weight:800;font-size:14px;padding:6px 12px;border-radius:20px;animation:pop .5s 1.6s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes pop{from{transform:scale(0)}}
+.cap{text-align:center;font-size:13px;color:var(--mut);margin:14px 0 0}
+.sec{padding:32px 0;border-top:1.5px solid var(--line)}
+.sec h2{font-size:24px;line-height:1.3;margin:0 0 6px}.sec>p{color:var(--mut);margin:0 0 18px}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:12px;counter-reset:s}
+.steps li{counter-increment:s;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 4px 0 rgba(0,0,0,.18),var(--glow)}
+.steps li::before{content:counter(s);display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--g1);border:2px solid var(--line);color:var(--ink);font-weight:800;margin-bottom:10px}
+.steps b{display:block;font-size:17px}.steps span{color:var(--mut);font-size:15px}
+.ladder{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.ladder li{display:grid;grid-template-columns:88px 1fr 60px;gap:10px;align-items:center;font-size:15px}
+.ladder i{display:block;height:12px;border-radius:6px}
+.ladder small{color:var(--mut);text-align:right}
+.tracks{display:grid;gap:16px}.tracks div{border-left:5px solid var(--a2);padding:2px 0 2px 14px}
+.tracks b{display:block;font-size:18px}.tracks span{color:var(--mut)}
+.pr{list-style:none;padding:0;margin:0;display:grid;gap:12px}
+.pr li{padding-left:30px;position:relative}
+.pr li::before{content:"";position:absolute;left:0;top:6px;width:16px;height:16px;background:var(--a2);border:2px solid var(--ink);border-radius:4px}
+details{border-top:1.5px solid var(--line);padding:12px 0}
+summary{cursor:pointer;font-weight:700;min-height:28px}
+details p{margin:8px 0 0;color:var(--mut)}
+.cta{background:var(--card);border:2px solid var(--line);color:var(--ink);border-radius:20px;padding:30px 20px;text-align:center;margin:20px 0;box-shadow:0 6px 0 rgba(0,0,0,.18),var(--glow)}
+.cta h2{margin:0 0 6px;font-size:26px;line-height:1.25}.cta p{margin:0 0 16px}
+.cta .btn{max-width:320px;margin:0 auto}
+.fo{font-size:13px;color:var(--mut);padding:10px 0 4px;text-align:center}
+@media (min-width:760px){.hero{grid-template-columns:1.15fr .85fr;align-items:center;padding-top:36px}.steps{grid-template-columns:repeat(4,1fr)}.tracks{grid-template-columns:repeat(3,1fr)}.ladder{max-width:600px}.sec h2{font-size:28px}}
+/* ===== ยกระดับ: ฟอนต์ ฉากเลเวลอัป ตัวคำนวณ แถบสมัครลอย ===== */
+:root{--fd:"Kanit","Noto Sans Thai",system-ui,sans-serif}
+h1,h2,.wm,.btn,.av,summary,.steps b,.tracks b,.toast,.chip,.lvup,.seg button,.ladder span{font-family:var(--fd)}
+.tag{font-size:clamp(36px,10.5vw,66px);line-height:1.06;font-weight:800;letter-spacing:-.5px}
+.sec h2,.cta h2{font-weight:700}
+.stage{position:relative;justify-self:center;width:100%;max-width:360px;padding:22px 0 12px}
+.chip{position:absolute;z-index:2;font-weight:700;font-size:13px;padding:6px 12px;border-radius:20px;background:var(--card);border:2px solid var(--line);color:var(--ink);animation:bob 4s ease-in-out infinite}
+.c1{left:-8px;top:0}.c2{right:-8px;bottom:30%;animation-delay:-1.3s}.c3{left:6%;bottom:30px;animation-delay:-2.2s}
+@keyframes bob{50%{transform:translateY(-7px)}}
+.xp i{animation:fl 7s ease-in-out infinite}
+@keyframes fl{0%{width:30%}55%,90%{width:100%}100%{width:30%}}
+.toast{animation:tl 7s infinite}
+@keyframes tl{0%,6%{transform:scale(0)}11%,44%{transform:scale(1)}50%,100%{transform:scale(0)}}
+.lvup{position:absolute;left:50%;top:50%;z-index:3;transform:translate(-50%,-50%) scale(0);background:var(--a3);color:#1B1250;font-weight:800;font-size:22px;padding:10px 22px;border-radius:14px;border:3px solid #1B1250;box-shadow:0 5px 0 rgba(0,0,0,.35);white-space:nowrap;animation:lvl 7s infinite}
+@keyframes lvl{0%,58%{transform:translate(-50%,-50%) scale(0)}64%{transform:translate(-50%,-50%) scale(1.15)}68%,88%{transform:translate(-50%,-50%) scale(1)}94%,100%{transform:translate(-50%,-50%) scale(0)}}
+.seg{display:flex;gap:8px;margin:0 0 16px}
+.seg button{flex:1;min-height:48px;font-weight:700;font-size:15px;color:var(--ink);background:transparent;border:2px solid var(--line);border-radius:12px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--g1);border-color:var(--ink);color:var(--ink);box-shadow:0 3px 0 var(--line)}
+.ladder li{grid-template-columns:84px 1fr 84px}
+.ladder i{width:0;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:6;padding:10px 16px max(10px,env(safe-area-inset-bottom));background:color-mix(in srgb,var(--bg) 90%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:2px solid var(--line);transform:translateY(110%);transition:transform .25s}
+.dock.on{transform:none}.dock .btn{margin:0 auto;max-width:520px}
+.fo{padding-bottom:84px}
+@media (min-width:760px){.dock{display:none}.fo{padding-bottom:10px}}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.door,.chip,.toast,.xp i{animation:none}.xp i{width:66%}.lvup{display:none}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="logo" viewBox="0 0 100 100"><rect style="fill:var(--ink)" x="10" y="8" width="20" height="84" rx="2"/><rect style="fill:var(--ink)" x="70" y="8" width="20" height="84" rx="2"/><rect style="fill:var(--ink)" x="30" y="40" width="40" height="12"/><path style="fill:var(--ink)" d="M33 52h9v38l-9-4z"/><path style="fill:var(--acc)" d="M46 52l22-6v44l-22-4z"/></symbol></svg>
+<main><div id="app"></div></main>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+<script>
+'use strict';
+// ===== ตั้งค่า (ค่า publishable key เปิดเผยได้ตามหลักของ Supabase) =====
+const CFG={url:'https://xbsoopydnycvbzpjshbg.supabase.co',key:'sb_publishable_Sn9b94qaaFmk91CBZC_X8Q_fSciGmg9',site:'0x4AAAAAAFlCsg99TKfH8_Ax'};
+const DOCV={terms:'1.0',privacy:'1.0',community:'1.0',pw_ack:'1.0'};
+// ข้อความทั้งหมดอยู่ที่นี่ (ภาษาไทย) เพิ่ม en ภายหลังได้
+const T={
+ loginFail:'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง หรือลองมากเกินไป กรุณารอแล้วลองใหม่',
+ generic:'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง',
+ err:{captcha_failed:'ยืนยันตัวตนไม่สำเร็จ กรุณาลองใหม่',under_13:'ต้องมีอายุ 13 ปีขึ้นไปจึงใช้งานได้',invalid_birth_month:'เดือนและปีเกิดไม่ถูกต้อง',
+  invalid_username:'ชื่อผู้ใช้ต้องเป็น a-z 0-9 หรือ _ ยาว 3-20 ตัว',invalid_display_name:'ชื่อแสดงต้องยาว 2-24 ตัวอักษร',
+  invite_invalid:'รหัสนี้ใช้ไม่ได้',username_unavailable:'ชื่อผู้ใช้นี้ใช้ไม่ได้ ลองชื่ออื่น',
+  password_too_short:'รหัสผ่านต้องยาว 10 ตัวขึ้นไป',password_too_long:'รหัสผ่านยาวเกินไป',password_too_common:'รหัสผ่านนี้เดาง่ายเกินไป เปลี่ยนเป็นอย่างอื่น',
+  consent_required:'ต้องยอมรับเงื่อนไขทั้ง 4 ข้อก่อน',rate_limited:'ลองมากเกินไป กรุณารอสักครู่แล้วลองใหม่',
+  invalid_or_limited:'ข้อมูลไม่ถูกต้อง หรือลองมากเกินไป กรุณารอแล้วลองใหม่',signup_closed:'ขณะนี้ยังไม่เปิดรับสมัคร'},
+ strength:['','อ่อนมาก','อ่อน','พอใช้','ดี','แข็งแรง']
+};
+const MONTHS=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const INVITE_RE=/^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{8}$/;
+const BACK_TO_STEP1=['invite_invalid','under_13','consent_required','invalid_birth_month'];
+
+// ===== ตัวช่วย =====
+const $=(s,r=document)=>r.querySelector(s);
+const app=$('#app');
+const say=(el,t,ok)=>{el.textContent=t||'';el.className='msg'+(ok?' ok':'')};
+async function post(path,body,bearer){
+  const h={'Content-Type':'application/json',apikey:CFG.key};
+  if(bearer)h.Authorization='Bearer '+bearer;
+  const r=await fetch(CFG.url+path,{method:'POST',headers:h,body:JSON.stringify(body)});
+  let j={};try{j=await r.json()}catch(_){}
+  return{ok:r.ok,j};
+}
+const brand='<a class="brand" href="#/" aria-label="Heroroom หน้าแรก"><svg class="logo" aria-hidden="true"><use href="#logo"/></svg><div class="wm"><b>HERO</b>Room</div></a>';
+
+// Turnstile: token ใช้ได้ครั้งเดียว ต้อง reset หลังส่งทุกครั้ง
+let tok=null,wid=null,onTok=()=>{};
+function mountTS(box,cb){
+  onTok=cb;tok=null;
+  (function go(){
+    if(!window.turnstile){setTimeout(go,200);return}
+    wid=turnstile.render(box,{sitekey:CFG.site,theme:'auto',language:'th',
+      callback:t=>{tok=t;onTok()},'expired-callback':()=>{tok=null;onTok()},'error-callback':()=>{tok=null;onTok()}});
+  })();
+}
+function dropTS(){
+  if(window.turnstile&&wid!==null){try{turnstile.remove(wid)}catch(_){}}
+  wid=null;tok=null;
+}
+function freshTS(){tok=null;if(window.turnstile&&wid!==null){try{turnstile.reset(wid)}catch(_){}}onTok()}
+
+// ===== สถานะในหน่วยความจำเท่านั้น (ไม่เก็บลง storage) =====
+let sess=null,codes=null,prefill='',io=null;
+
+// ===== หน้าแรก =====
+const RANKS=[['มือใหม่','1-9','#B98255',[0,0]],['ผู้ฝึกหัด','10-19','#9FB0C8',[9,3]],['นักผจญภัย','20-29','#27E1C1',[44,16]],['นักรบ','30-39','#5CF2A8',[110,41]],['อัศวิน','40-49','#4DA3FF',[211,79]],['จอมยุทธ์','50-59','#A66BFF',[347,130]],['ผู้พิทักษ์','60-69','#FF4FA3',[522,196]],['ปรมาจารย์','70-79','#FF8A3D',[739,277]],['ตำนาน','80-89','#FFD43B',[993,373]],['ราชัน','90-100','linear-gradient(90deg,#FFD43B,#FF4FA3,#27E1C1)',[1294,485]]];
+const FAQ=[
+ ['ต้องมีรหัสเชิญไหม','ตอนนี้ต้องมี เพราะเปิดเป็นรอบเพื่อดูแลชุมชนให้ทั่วถึง ได้รหัสจากผู้ดูแลหรือเพื่อนที่ใช้อยู่แล้ว'],
+ ['ใช้ฟรีหรือเปล่า','ฟรี ยศและ XP ได้จากการเล่นเท่านั้น เงินซื้อยศ XP หรืออันดับไม่ได้'],
+ ['อายุเท่าไรถึงสมัครได้','ตั้งแต่ 13 ปีขึ้นไป ผู้ใช้ 13-17 ปีได้รับการป้องกันเป็นค่าเริ่มต้น เช่น โปรไฟล์ส่วนตัวและจำกัดผู้ที่ทักได้'],
+ ['ลืมรหัสผ่านทำอย่างไร','ตอนสมัครคุณจะได้รหัสกู้คืน 10 ตัว ใช้กู้ได้รหัสละครั้ง ไม่มีใครรีเซ็ตให้ได้ รวมถึงแอดมิน ดังนั้นเก็บรหัสไว้ที่ปลอดภัย']
+];
+function landing(){
+  document.querySelector('main').classList.add('wide');
+  app.innerHTML=`<header class="nav">${brand}<a class="btn" href="#/login">เข้าสู่ระบบ</a></header>
+  <section class="hero"><div>
+   <svg class="big" viewBox="0 0 100 100" aria-hidden="true"><rect class="pl" x="10" y="8" width="20" height="84" rx="2"/><rect class="pl" x="70" y="8" width="20" height="84" rx="2"/><rect class="pl" x="30" y="40" width="40" height="12"/><path class="pl" d="M33 52h9v38l-9-4z"/><path class="door" d="M46 52l22-6v44l-22-4z"/></svg>
+   <h1 class="tag">ทุกโพสต์ คือก้าวหนึ่งของการผจญภัย</h1>
+   <p class="sub">โซเชียลที่ทุกโพสต์ ไลก์ และคอมเมนต์พาคุณเลเวลอัป เปิดประตูเข้าห้องของคุณแล้วเริ่มเล่นได้เลย</p>
+   <a class="btn pri" href="#/signup">สมัครด้วยรหัสเชิญ</a>
+   <a class="btn" href="#/login">เข้าสู่ระบบ</a>
+  </div>
+  <div class="stage" aria-hidden="true"><span class="chip c1">คอมเมนต์ +8 XP</span><span class="chip c2">ปฏิกิริยา +2 XP</span><span class="chip c3">ล็อกอินรายวัน +10 XP</span>
+   <div class="phone"><div class="toast">+20 XP</div><div class="lvup">LEVEL UP</div>
+   <div class="pf"><div class="av">ก</div><div><b>กล้า</b><small>นักผจญภัย</small></div></div>
+   <div class="xp"><i></i></div><div class="xpl"><span>เลเวล 24</span><span>เลเวล 25</span></div>
+   <div class="post"><p>วาดการ์ตูนเรื่องแรกเสร็จแล้ว ขอบคุณทุกคนที่คอยเชียร์</p><small>ปฏิกิริยา 12 &nbsp; คอมเมนต์ 4</small></div></div>
+   <p class="cap">ตัวอย่างหน้าจอ</p></div>
+  </section>
+  <section class="sec"><h2>เล่นอย่างไร</h2><p>ไม่ต้องมีโหมดเกมแยก ใช้โซเชียลตามปกติแล้วเกมเดินไปเอง</p>
+   <ol class="steps">
+    <li><b>โพสต์หรือคอมเมนต์</b><span>ทุกการกระทำทางสังคมคือการกระทำในเกม</span></li>
+    <li><b>รับ XP</b><span>โพสต์ 20 คอมเมนต์ 8 ล็อกอินรายวัน 10 สูงสุด 500 ต่อวัน</span></li>
+    <li><b>เลเวลอัป</b><span>เลเวล 2 มาตั้งแต่โพสต์แรกของวันแรก</span></li>
+    <li><b>ขึ้นยศ</b><span>10 ยศ จากมือใหม่ถึงราชัน ยศซื้อไม่ได้</span></li>
+   </ol></section>
+  <section class="sec"><h2>เส้นทางสู่ราชัน</h2><p>เลเวล 1 ถึง 100 แบ่งเป็น 10 ยศ เลือกสไตล์การเล่นแล้วดูว่าแต่ละยศใช้เวลาประมาณกี่วัน</p>
+   <div class="seg" role="group" aria-label="สไตล์การเล่น"><button type="button" aria-pressed="true">สบายๆ ราว 150 XP ต่อวัน</button><button type="button" aria-pressed="false">จริงจัง ราว 400 XP ต่อวัน</button></div>
+   <ul class="ladder">${RANKS.map(r=>`<li><span>${r[0]}</span><i style="background:${r[2]}"></i><small></small></li>`).join('')}</ul>
+   <p class="cap">ค่าประมาณจากการออกแบบ ปรับสมดุลได้ตามการเล่นจริง</p></section>
+  <section class="sec"><h2>สามสายที่โตไปพร้อมกัน</h2><p>XP จากทุกสายรวมเป็นเลเวลหลักของคุณ</p>
+   <div class="tracks"><div><b>ครีเอเตอร์</b><span>จากการสร้างโพสต์และการถูกตอบรับ</span></div><div><b>เพื่อนพ้อง</b><span>จากการโต้ตอบกับคนอื่น</span></div><div><b>ผู้นำ</b><span>จากการช่วยคนอื่น เช่น คอมเมนต์ที่มีประโยชน์ และการชวนเพื่อน</span></div></div></section>
+  <section class="sec"><h2>กติกาที่เราสัญญา</h2><p>เขียนไว้ในเอกสารออกแบบของระบบตั้งแต่วันแรก</p>
+   <ul class="pr"><li>ยศ XP และอันดับ ซื้อด้วยเงินไม่ได้</li><li>ไม่มีกล่องสุ่มที่ต้องจ่ายเงิน</li><li>เหรียญและอัญมณีแลกเป็นเงินจริงไม่ได้</li><li>ผู้ใช้ 13-17 ปีได้รับการป้องกันเป็นค่าเริ่มต้น และปิดเองไม่ได้</li><li>ตอนนี้ใช้ฟรี</li></ul></section>
+  <section class="sec"><h2>คำถามที่พบบ่อย</h2>${FAQ.map(f=>`<details><summary>${f[0]}</summary><p>${f[1]}</p></details>`).join('')}</section>
+  <section class="cta"><h2>พร้อมเปิดประตูแล้วหรือยัง</h2><p>มีรหัสเชิญแล้ว สมัครได้ในไม่กี่นาที</p><a class="btn pri" href="#/signup">สมัครด้วยรหัสเชิญ</a></section>
+  <div class="dock" aria-label="สมัครสมาชิก"><a class="btn pri" href="#/signup">สมัครด้วยรหัสเชิญ</a></div>
+  <p class="fo">Heroroom &nbsp;|&nbsp; สำหรับผู้มีอายุ 13 ปีขึ้นไป &nbsp;|&nbsp; เปิดเป็นรอบด้วยรหัสเชิญ</p>`;
+  const L=$('.ladder'),bt=[...document.querySelectorAll('.seg button')];let mode=0,shown=false;
+  const draw=()=>{[...L.children].forEach((li,i)=>{const d=RANKS[i][3][mode];
+    li.querySelector('i').style.width=shown?Math.max(d/1294*100,3)+'%':'0';
+    li.querySelector('small').textContent=d?'ราว '+d.toLocaleString('th-TH')+' วัน':'เริ่มต้น'});
+    bt.forEach((b,k)=>b.setAttribute('aria-pressed',String(k===mode)))};
+  bt.forEach((b,k)=>b.onclick=()=>{mode=k;shown=true;draw()});draw();
+  if(!('IntersectionObserver' in window)){shown=true;draw();return}
+  const hero=$('.hero .btn.pri'),cta=$('.cta'),dock=$('.dock');let hv=true,cv=false;
+  io=new IntersectionObserver(es=>{es.forEach(e=>{
+    if(e.target===L){if(e.isIntersecting&&!shown){shown=true;draw()}}
+    else if(e.target===hero)hv=e.isIntersecting;else cv=e.isIntersecting});
+    dock.classList.toggle('on',!hv&&!cv)});
+  io.observe(L);io.observe(hero);io.observe(cta);
+}
+
+// ===== หน้า: ล็อกอิน =====
+function login(){
+  app.innerHTML=brand+`<div class="card"><h1>เข้าสู่ระบบ</h1>
+  <form id="f" novalidate>
+   <label>ชื่อผู้ใช้<input type="text" id="u" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="20"></label>
+   <label>รหัสผ่าน<input type="password" id="p" autocomplete="current-password" maxlength="72"></label>
+   <div id="ts"></div><p class="msg" id="m" role="alert"></p>
+   <button class="btn pri" id="go" disabled>เข้าสู่ระบบ</button>
+  </form></div>
+  <p class="lk"><a href="#/forgot">ลืมรหัสผ่าน</a> &nbsp;|&nbsp; <a href="#/signup">สมัครสมาชิก</a></p>`;
+  const u=$('#u'),p=$('#p'),go=$('#go'),m=$('#m');let busy=false;
+  if(prefill){u.value=prefill;prefill='';say(m,'สมัครสำเร็จ เข้าสู่ระบบด้วยรหัสผ่านที่ตั้งไว้',true)}
+  const upd=()=>{go.disabled=busy||!tok||!u.value||!p.value};
+  u.oninput=p.oninput=upd;mountTS($('#ts'),upd);
+  $('#f').onsubmit=async e=>{
+    e.preventDefault();if(busy||go.disabled)return;
+    busy=true;upd();say(m,'');let ok=false;
+    try{
+      const r=await post('/functions/v1/resolve-login',{username:u.value.trim().toLowerCase()});
+      if(r.ok&&r.j.email){
+        const a=await post('/auth/v1/token?grant_type=password',{email:r.j.email,password:p.value,gotrue_meta_security:{captcha_token:tok}});
+        if(a.ok&&a.j.access_token){ok=true;sess=a.j;home()}
+      }
+    }catch(_){}
+    busy=false;
+    if(!ok){say(m,T.loginFail);p.value='';freshTS()}
+    upd();
+  };
+}
+
+// ===== หน้า: หลังล็อกอิน (ชั่วคราว จนกว่าจะมีแอปหลัก) =====
+function home(){
+  dropTS();
+  app.innerHTML=brand+`<div class="card"><h1>เข้าสู่ระบบสำเร็จ</h1>
+  <p class="hint">หน้านี้ชั่วคราว ตัวแอปหลัก (onboarding และหน้าแรก) จะต่อจากจุดนี้</p>
+  <button class="btn" id="lo">ออกจากระบบ</button></div>`;
+  $('#lo').onclick=async()=>{
+    const t=sess&&sess.access_token;sess=null;
+    try{if(t)await post('/auth/v1/logout',{},t)}catch(_){}
+    location.hash='#/login';route();
+  };
+}
+
+// ===== หน้า: สมัคร =====
+function strength(pw){
+  let s=0;if(pw.length>=10)s++;if(pw.length>=14)s++;
+  if(/[a-z]/.test(pw)&&/[A-Z]/.test(pw))s++;if(/\d/.test(pw))s++;if(/[^A-Za-z0-9]/.test(pw))s++;
+  return pw.length<10?Math.min(s,1):Math.max(s,2);
+}
+function signup(invite){
+  const yr=new Date().getFullYear();
+  app.innerHTML=brand+`<div class="card"><h1>สมัครสมาชิก</h1>
+  <form id="f" novalidate>
+   <div id="s1">
+    <label>รหัสเชิญ 8 ตัว<input type="text" id="iv" maxlength="8" autocapitalize="characters" autocomplete="off" spellcheck="false"></label>
+    <fieldset><legend>เดือนและปีเกิด</legend>
+     <div class="row"><select id="bm" aria-label="เดือนเกิด"><option value="">เดือน</option>${MONTHS.map((n,i)=>`<option value="${i+1}">${n}</option>`).join('')}</select>
+     <select id="by" aria-label="ปีเกิด (ค.ศ.)"><option value="">ปี ค.ศ.</option>${Array.from({length:100},(_,i)=>`<option>${yr-i}</option>`).join('')}</select></div>
+     <p class="hint">ใช้กำหนดกลุ่มอายุ ไม่แสดงให้ใครเห็น</p></fieldset>
+    <label class="ck"><input type="checkbox" class="cc"> ยอมรับข้อกำหนดการใช้งาน</label>
+    <label class="ck"><input type="checkbox" class="cc"> ยอมรับนโยบายความเป็นส่วนตัว</label>
+    <label class="ck"><input type="checkbox" class="cc"> ยอมรับกฎชุมชน</label>
+    <label class="ck"><input type="checkbox" class="cc"> รับทราบว่าถ้าทำรหัสผ่านและรหัสกู้คืนหายทั้งหมด จะกู้บัญชีไม่ได้ และไม่มีใครรีเซ็ตให้ได้ รวมถึงแอดมิน</label>
+    <p class="msg" id="m1" role="alert"></p>
+    <button type="button" class="btn pri" id="nx">ต่อไป</button>
+   </div>
+   <div id="s2" hidden>
+    <label>ชื่อผู้ใช้<input type="text" id="un" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="20"><span class="hint">a-z 0-9 และ _ ยาว 3-20 ตัว</span></label>
+    <label>ชื่อแสดง<input type="text" id="dn" autocomplete="nickname" maxlength="24"></label>
+    <label>รหัสผ่าน<input type="password" id="pw" autocomplete="new-password" maxlength="72"><div class="bar"><i id="bi"></i></div><span class="hint" id="bl"></span></label>
+    <p class="hint">จำรหัสนี้ไว้ให้ดี และเก็บรหัสกู้คืน 10 ตัวที่จะได้หลังสมัครไว้กับตัว</p>
+    <div id="ts"></div><p class="msg" id="m2" role="alert"></p>
+    <button class="btn pri" id="go" disabled>สร้างบัญชี</button>
+    <button type="button" class="btn" id="bk">ย้อนกลับ</button>
+   </div>
+  </form></div>
+  <p class="lk">มีบัญชีแล้ว <a href="#/login">เข้าสู่ระบบ</a></p>`;
+  const iv=$('#iv'),m1=$('#m1'),m2=$('#m2'),s1=$('#s1'),s2=$('#s2'),go=$('#go');let busy=false,tsOn=false;
+  if(invite)iv.value=invite.slice(0,8);
+  const upd=()=>{go.disabled=busy||!tok||!$('#un').value||!$('#dn').value||!$('#pw').value};
+  const step=n=>{s1.hidden=n!==1;s2.hidden=n!==2;if(n===2&&!tsOn){tsOn=true;mountTS($('#ts'),upd)}};
+  $('#nx').onclick=()=>{
+    const code=iv.value.trim().toUpperCase(),mo=+$('#bm').value,y=+$('#by').value;
+    if(!INVITE_RE.test(code))return say(m1,T.err.invite_invalid);
+    if(!mo||!y)return say(m1,T.err.invalid_birth_month);
+    if(Date.now()<Date.UTC(y+13,mo,1))return say(m1,T.err.under_13); // ใต้ 13: ไม่ส่งและไม่เก็บอะไร
+    if([...document.querySelectorAll('.cc')].some(c=>!c.checked))return say(m1,T.err.consent_required);
+    say(m1,'');step(2);$('#un').focus();
+  };
+  $('#bk').onclick=()=>step(1);
+  $('#un').oninput=$('#dn').oninput=upd;
+  $('#pw').oninput=e=>{
+    const s=strength(e.target.value),b=$('#bi');
+    b.style.width=e.target.value?s*20+'%':'0';b.style.background=s>=4?'var(--ok)':s>=3?'var(--acc)':'var(--err)';
+    $('#bl').textContent=e.target.value?T.strength[s]:'';upd();
+  };
+  $('#f').onsubmit=async e=>{
+    e.preventDefault();if(busy||go.disabled)return;
+    const un=$('#un').value.trim().toLowerCase(),dn=$('#dn').value.trim(),pw=$('#pw').value;
+    if(!/^[a-z0-9_]{3,20}$/.test(un))return say(m2,T.err.invalid_username);
+    const dl=[...dn].length;if(dl<2||dl>24)return say(m2,T.err.invalid_display_name);
+    if(pw.length<10)return say(m2,T.err.password_too_short);
+    busy=true;upd();say(m2,'');
+    const bm=$('#by').value+'-'+String($('#bm').value).padStart(2,'0');
+    let done=false;
+    try{
+      const r=await post('/functions/v1/signup',{turnstile_token:tok,birth_month:bm,username:un,display_name:dn,
+        invite_code:iv.value.trim().toUpperCase(),password:pw,consent:DOCV});
+      if(r.ok&&r.j.ok&&Array.isArray(r.j.recovery_codes)){done=true;showCodes(r.j.recovery_codes,un)}
+      else{
+        const k=r.j&&r.j.error;
+        if(BACK_TO_STEP1.includes(k)){step(1);say(m1,T.err[k])}
+        else say(m2,T.err[k]||T.generic);
+      }
+    }catch(_){say(m2,T.generic)}
+    busy=false;if(!done){freshTS()}
+  };
+}
+
+// ===== หน้า: รหัสกู้คืน (แสดงครั้งเดียว อยู่ในหน่วยความจำเท่านั้น) =====
+function showCodes(list,username){
+  dropTS();codes=list.slice();
+  app.innerHTML=brand+`<div class="card"><h1>เก็บรหัสกู้คืนของคุณ</h1>
+  <p>รหัสชุดนี้ใช้กู้บัญชีเมื่อลืมรหัสผ่าน ใช้ได้รหัสละ 1 ครั้ง และแสดงให้เห็นครั้งเดียวเท่านั้น ไม่มีใครกู้แทนได้ รวมถึงแอดมิน <b>ห้ามรีเฟรชหน้านี้</b></p>
+  <ol class="codes" id="cl"></ol>
+  <div class="row"><button type="button" class="btn" id="cp">คัดลอกทั้งชุด</button><button type="button" class="btn" id="sv">บันทึกเป็นไฟล์</button></div>
+  <p class="msg ok" id="m" role="status"></p>
+  <label class="ck"><input type="checkbox" id="ok"> ฉันบันทึกรหัสไว้ที่ปลอดภัยแล้ว</label>
+  <button class="btn pri" id="nx" disabled>ไปต่อ</button></div>`;
+  const ol=$('#cl');codes.forEach(c=>{const li=document.createElement('li');li.textContent=c;ol.appendChild(li)});
+  let saved=false;const m=$('#m'),nx=$('#nx'),ok=$('#ok');
+  const upd=()=>{nx.disabled=!(saved&&ok.checked)};
+  ok.onchange=upd;
+  $('#cp').onclick=async()=>{
+    const txt=codes.join('\n');
+    try{await navigator.clipboard.writeText(txt)}catch(_){
+      const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();
+      try{document.execCommand('copy')}catch(_){}ta.remove();
+    }
+    saved=true;say(m,'คัดลอกแล้ว นำไปวางเก็บไว้ในที่ปลอดภัย',true);upd();
+  };
+  $('#sv').onclick=()=>{
+    const body='Heroroom - รหัสกู้คืน\nชื่อผู้ใช้: '+username+'\nแต่ละรหัสใช้ได้ครั้งเดียว เก็บไว้ในที่ปลอดภัย\n\n'+codes.join('\n')+'\n';
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([body],{type:'text/plain;charset=utf-8'}));
+    a.download='heroroom-recovery-codes.txt';document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    saved=true;say(m,'บันทึกไฟล์แล้ว เก็บไว้ในที่ปลอดภัย',true);upd();
+  };
+  window.onbeforeunload=e=>{e.preventDefault();e.returnValue=''};
+  nx.onclick=()=>{
+    window.onbeforeunload=null;codes.length=0;codes=null;ol.textContent='';
+    prefill=username;location.hash='#/login';route();
+  };
+}
+
+// ===== หน้า: ลืมรหัสผ่าน (กู้ด้วยรหัสกู้คืน 1 ตัว) =====
+function forgot(){
+  app.innerHTML=brand+`<div class="card"><h1>กู้รหัสผ่าน</h1>
+  <p class="hint">ใช้รหัสกู้คืน 1 ตัวจากชุดที่ได้ตอนสมัคร รหัสแต่ละตัวใช้ได้ครั้งเดียว</p>
+  <form id="f" novalidate>
+   <label>ชื่อผู้ใช้<input type="text" id="u" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="20"></label>
+   <label>รหัสกู้คืน<input type="text" id="rc" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="24" placeholder="XXXX-XXXX-XXXX-XXXX"></label>
+   <label>รหัสผ่านใหม่<input type="password" id="n1" autocomplete="new-password" maxlength="72"></label>
+   <label>ยืนยันรหัสผ่านใหม่<input type="password" id="n2" autocomplete="new-password" maxlength="72"></label>
+   <div id="ts"></div><p class="msg" id="m" role="alert"></p>
+   <button class="btn pri" id="go" disabled>เปลี่ยนรหัสผ่าน</button>
+  </form></div>
+  <p class="lk"><a href="#/login">กลับไปเข้าสู่ระบบ</a></p>`;
+  const go=$('#go'),m=$('#m');let busy=false;
+  const ids=['#u','#rc','#n1','#n2'];
+  const upd=()=>{go.disabled=busy||!tok||ids.some(i=>!$(i).value)};
+  ids.forEach(i=>$(i).oninput=upd);mountTS($('#ts'),upd);
+  $('#f').onsubmit=async e=>{
+    e.preventDefault();if(busy||go.disabled)return;
+    if($('#n1').value!==$('#n2').value)return say(m,'รหัสผ่านใหม่ทั้งสองช่องไม่ตรงกัน');
+    busy=true;upd();say(m,'');let ok=false;
+    try{
+      const r=await post('/functions/v1/reset-with-code',{turnstile_token:tok,username:$('#u').value.trim().toLowerCase(),
+        recovery_code:$('#rc').value.trim(),new_password:$('#n1').value});
+      if(r.ok&&r.j.ok){
+        ok=true;prefill=$('#u').value.trim().toLowerCase();
+        say(m,'เปลี่ยนรหัสผ่านแล้ว เหลือรหัสกู้คืน '+r.j.remaining+' ตัว เข้าสู่ระบบด้วยรหัสผ่านใหม่ได้เลย',true);
+        ids.forEach(i=>$(i).value='');setTimeout(()=>{location.hash='#/login'},2500);
+      }else say(m,T.err[r.j&&r.j.error]||T.generic);
+    }catch(_){say(m,T.generic)}
+    busy=false;if(!ok)freshTS();upd();
+  };
+}
+
+// ===== เราเตอร์ (hash) =====
+function route(){
+  if(io){io.disconnect();io=null}
+  dropTS();document.querySelector('main').classList.remove('wide');
+  const h=location.hash.replace(/^#\/?/,'').split('/'),r=h[0];
+  if(sess)return home();
+  if(r==='signup')return signup();
+  if(r==='invite')return signup((h[1]||'').toUpperCase());
+  if(r==='forgot')return forgot();
+  if(r==='login')return login();
+  return landing();
+}
+addEventListener('hashchange',()=>{if(!codes)route()});
+route();
+</script>
+</body>
+</html>

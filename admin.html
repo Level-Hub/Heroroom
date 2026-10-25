@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#120B3A">
+<title>404</title>
+<style>
+:root{color-scheme:dark;--bg:#120B3A;--ink:#F6F3FF;--card:#1D1559;--line:#4A3DA8;--mut:#BDB4F2;--acc:#FFD43B;--accink:#1B1250;--accsh:#C28A00;--a2:#27E1C1;--err:#FF9AAE;--ok:#5CF2A8;--red:#D92D45}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 "Noto Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;padding:max(14px,env(safe-area-inset-top)) 14px max(20px,env(safe-area-inset-bottom))}
+main{max-width:760px;margin:0 auto}
+h1{font-size:20px;margin:0}h2{font-size:18px;margin:18px 0 8px}
+.nf{min-height:70vh;display:grid;place-items:center;text-align:center;color:var(--mut)}
+.card{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:16px;margin:0 0 12px}
+label{display:block;font-weight:600;margin:0 0 12px}
+input{display:block;width:100%;min-height:46px;margin-top:5px;padding:9px 12px;font:inherit;color:var(--ink);background:transparent;border:1.5px solid var(--line);border-radius:10px}
+input:focus,button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.btn{min-height:44px;padding:0 16px;font:inherit;font-weight:700;color:var(--ink);background:transparent;border:2px solid var(--ink);border-radius:10px;cursor:pointer;box-shadow:0 3px 0 var(--line)}
+.btn:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:var(--accink);box-shadow:0 3px 0 var(--accsh)}
+.btn:disabled{opacity:.45}.btn.sm{min-height:36px;padding:0 12px;font-size:14px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 12px;flex-wrap:wrap}
+.top div{display:flex;gap:8px;flex-wrap:wrap}
+.tabs{display:flex;gap:8px;margin:0 0 12px}.tabs .btn{flex:1}
+.tabs .btn[aria-pressed=true]{background:#4B2FD0;border-color:var(--ink)}
+.bar{position:sticky;top:0;z-index:5;background:var(--red);color:#fff;font-weight:700;padding:10px 14px;margin:0 -14px 12px;text-align:center}
+.msg{min-height:22px;color:var(--err);font-weight:600}.msg.ok{color:var(--ok)}
+.n{display:flex;gap:10px;align-items:center;justify-content:space-between;border:2px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 8px;background:var(--card)}
+.n.urgent{border-color:var(--red)}.n.high{border-color:var(--err)}.n.done{opacity:.55}
+.n small{color:var(--mut);display:block}
+.tag{display:inline-block;font-size:12px;font-weight:700;padding:1px 8px;border-radius:10px;border:1.5px solid var(--line);margin-right:6px}
+.tag.urgent{background:var(--red);border-color:var(--red);color:#fff}.tag.high{border-color:var(--err);color:var(--err)}
+.codes{list-style:none;margin:8px 0;padding:0;display:grid;gap:6px;font:600 17px ui-monospace,Menlo,Consolas,monospace}
+.codes li{padding:8px 12px;border:1.5px dashed var(--line);border-radius:8px;user-select:all}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.hint{color:var(--mut);font-size:14px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+<script>
+'use strict';
+const U='https://xbsoopydnycvbzpjshbg.supabase.co',K='sb_publishable_Sn9b94qaaFmk91CBZC_X8Q_fSciGmg9',SITE='0x4AAAAAAFlCsg99TKfH8_Ax';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let S=null,tab='inbox',rows=[],inv=[],known=new Set(),snd=false,ctx=null,timer=null,rt=null;
+const fmt=d=>new Date(d).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'});
+
+async function api(p,o,t){
+  const r=await fetch(U+p,Object.assign({},o,{headers:{apikey:K,'Content-Type':'application/json',Authorization:'Bearer '+(t||K)}}));
+  let j=null;try{j=await r.json()}catch(e){}
+  if(!r.ok)throw new Error((j&&(j.msg||j.message||j.error_description||j.error))||('HTTP '+r.status));
+  return j;
+}
+const rpc=(n,b)=>api('/rest/v1/rpc/'+n,{method:'POST',body:JSON.stringify(b||{})},S.access_token);
+const get=p=>api('/rest/v1/'+p,{},S.access_token);
+
+function show404(){document.title='404';$('#app').innerHTML='<div class="nf"><div><h1>404</h1><p>ไม่พบหน้านี้</p></div></div>'}
+function setSession(j){
+  S=j;clearTimeout(rt);
+  rt=setTimeout(async()=>{try{setSession(await api('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:JSON.stringify({refresh_token:S.refresh_token})}))}catch(e){signOut()}},Math.max(60,(j.expires_in||3600)-300)*1000);
+}
+function signOut(){S=null;clearInterval(timer);clearTimeout(rt);document.title='404';show404()}
+
+// ===== เข้าสู่ระบบ + MFA =====
+function loginView(msg){
+  document.title='Heroroom admin';
+  $('#app').innerHTML=`<h1>Heroroom admin</h1><form class="card" id="lf"><label>อีเมล<input id="em" type="email" autocomplete="username" required></label><label>รหัสผ่าน<input id="pw" type="password" autocomplete="current-password" required></label><div id="ts"></div><p class="msg" id="m">${esc(msg||'')}</p><button class="btn pri" id="go">เข้าสู่ระบบ</button></form>`;
+  let tok='';const w=setInterval(()=>{if(window.turnstile){clearInterval(w);window.turnstile.render('#ts',{sitekey:SITE,theme:'dark',callback:t=>tok=t})}},200);
+  $('#lf').onsubmit=async e=>{e.preventDefault();$('#go').disabled=true;$('#m').textContent='';
+    try{setSession(await api('/auth/v1/token?grant_type=password',{method:'POST',body:JSON.stringify({email:$('#em').value.trim(),password:$('#pw').value,gotrue_meta_security:{captcha_token:tok}})}));await mfa()}
+    catch(x){S=null;loginView('เข้าสู่ระบบไม่สำเร็จ');}};
+}
+async function mfa(){
+  const u=await api('/auth/v1/user',{},S.access_token);
+  const f=(u.factors||[]).find(x=>x.factor_type==='totp'&&x.status==='verified');
+  let id,note='';
+  if(f){id=f.id}else{
+    const e=await api('/auth/v1/factors',{method:'POST',body:JSON.stringify({factor_type:'totp',friendly_name:'admin-'+Date.now()})},S.access_token);
+    id=e.id;note=`<p class="hint">ครั้งแรก: เพิ่มบัญชีในแอปยืนยันตัวตนด้วยการกรอกรหัสลับเอง<br><b style="user-select:all;word-break:break-all">${esc(e.totp.secret)}</b></p>`;
+  }
+  $('#app').innerHTML=`<h1>ยืนยันตัวตนสองขั้น</h1><form class="card" id="mf">${note}<label>รหัส 6 หลัก<input id="cd" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required></label><p class="msg" id="m"></p><button class="btn pri">ยืนยัน</button></form>`;
+  $('#mf').onsubmit=async e=>{e.preventDefault();
+    try{const c=await api(`/auth/v1/factors/${id}/challenge`,{method:'POST'},S.access_token);
+      setSession(await api(`/auth/v1/factors/${id}/verify`,{method:'POST',body:JSON.stringify({challenge_id:c.id,code:$('#cd').value.trim()})},S.access_token));
+      const r=await get('admin_roles?select=role&user_id=eq.'+S.user.id+'&limit=1');
+      if(!r.length){S=null;return show404()}
+      start();
+    }catch(x){$('#m').textContent='รหัสไม่ถูกต้อง'}};
+}
+
+// ===== หน้าหลัก =====
+function start(){shell();load(true);timer=setInterval(()=>load(false),15000)}
+function shell(){
+  $('#app').innerHTML=`<div class="bar" id="ub" hidden></div><div class="top"><h1>Heroroom admin</h1><div><button class="btn sm" id="sn" aria-pressed="false">เสียง: ปิด</button><button class="btn sm" id="so">ออก</button></div></div><div class="tabs"><button class="btn" data-t="inbox">กล่องแจ้งเตือน</button><button class="btn" data-t="inv">รหัสเชิญ</button></div><div id="v"></div>`;
+  $('#so').onclick=signOut;
+  $('#sn').onclick=()=>{snd=!snd;$('#sn').textContent='เสียง: '+(snd?'เปิด':'ปิด');if(snd)beep()};
+  document.querySelectorAll('.tabs .btn').forEach(b=>b.onclick=()=>{tab=b.dataset.t;load(true)});
+}
+function beep(){try{ctx=ctx||new AudioContext();const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=880;g.gain.value=.15;o.start();o.stop(ctx.currentTime+.4)}catch(e){}}
+async function load(f){
+  if(!S)return;
+  try{
+    rows=await get('admin_notifications?select=*&order=created_at.desc&limit=60');
+    if(tab==='inv'&&f)inv=await get('invite_codes?select=code,status,expires_at,note,used_at,batch_id&order=created_at.desc&limit=60');
+  }catch(e){return}
+  const open=rows.filter(r=>!r.acked_at),urg=open.filter(r=>r.severity==='urgent');
+  const fresh=urg.some(r=>known.size&&!known.has(r.id));rows.forEach(r=>known.add(r.id));if(fresh&&snd)beep();
+  document.title=(open.length?`(${open.length}) `:'')+'Heroroom admin';
+  const ub=$('#ub');ub.hidden=!urg.length;ub.textContent=urg.length?`เรื่องเร่งด่วน ${urg.length} รายการ ยังไม่รับทราบ`:'';
+  document.querySelectorAll('.tabs .btn').forEach(b=>b.setAttribute('aria-pressed',b.dataset.t===tab));
+  if(tab==='inbox')inboxView();else if(f)invView();
+}
+function inboxView(){
+  $('#v').innerHTML=`<div class="top"><span class="hint">รีเฟรชอัตโนมัติทุก 15 วินาที</span><button class="btn sm" id="tt">ส่งแจ้งเตือนทดสอบ</button></div>`+
+  (rows.length?rows.map(r=>`<div class="n ${r.severity}${r.acked_at?' done':''}"><div><span class="tag ${r.severity}">${r.severity==='urgent'?'เร่งด่วน':r.severity==='high'?'สูง':'ปกติ'}</span>${esc(r.title)}<small>${fmt(r.created_at)}${r.ref_type?' · '+esc(r.ref_type)+(r.ref_id?' '+esc(String(r.ref_id).slice(0,8)):''):''}${r.acked_at?' · รับทราบแล้ว':''}</small></div>${r.acked_at?'':`<button class="btn sm" data-a="${r.id}">รับทราบ</button>`}</div>`).join(''):'<p class="hint">ยังไม่มีแจ้งเตือน</p>');
+  $('#tt').onclick=async()=>{try{await rpc('admin_test_notification');load(true)}catch(e){alert(e.message)}};
+  document.querySelectorAll('[data-a]').forEach(b=>b.onclick=async()=>{b.disabled=true;try{await rpc('ack_admin_notification',{p_id:+b.dataset.a});load(true)}catch(e){alert(e.message)}});
+}
+function invView(){
+  $('#v').innerHTML=`<form class="card" id="mi"><h2 style="margin-top:0">สร้างรหัสเชิญ</h2><div class="row"><label>จำนวน<input id="ic" type="number" min="1" max="50" value="5"></label><label>หมดอายุ (วัน)<input id="id" type="number" min="1" max="180" placeholder="ค่าเริ่มต้น"></label></div><label>บันทึก (ไม่บังคับ)<input id="in" maxlength="100"></label><p class="msg" id="m"></p><ul class="codes" id="nc"></ul><button class="btn pri">สร้างรหัส</button></form><h2>รหัสล่าสุด</h2>`+
+  (inv.length?inv.map(c=>`<div class="n${c.status!=='active'?' done':''}"><div><b style="font-family:ui-monospace,monospace">${esc(c.code)}</b><small>${esc(c.status)}${c.expires_at?' · หมดอายุ '+fmt(c.expires_at):''}${c.note?' · '+esc(c.note):''}</small></div>${c.status==='active'?`<button class="btn sm" data-r="${esc(c.code)}">เพิกถอน</button>`:''}</div>`).join(''):'<p class="hint">ยังไม่มีรหัส</p>');
+  $('#mi').onsubmit=async e=>{e.preventDefault();$('#m').className='msg';$('#m').textContent='';
+    try{const d=$('#id').value;const r=await rpc('admin_mint_invites',{p_count:+$('#ic').value,p_expires_days:d?+d:null,p_note:$('#in').value||null});
+      $('#nc').innerHTML=r.map(c=>`<li>${esc(c)}</li>`).join('');$('#m').className='msg ok';$('#m').textContent='สร้างแล้ว เก็บรหัสไว้ก่อนออกจากหน้านี้';
+      inv=await get('invite_codes?select=code,status,expires_at,note,used_at,batch_id&order=created_at.desc&limit=60');
+    }catch(x){$('#m').textContent=x.message==='daily_mint_limit'?'เกินจำนวนที่สร้างได้ต่อวัน':'สร้างไม่สำเร็จ: '+x.message}};
+  document.querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{const why=prompt('เหตุผลที่เพิกถอน (อย่างน้อย 10 ตัวอักษร)');if(!why)return;
+    try{await rpc('admin_revoke_invites',{p_code:b.dataset.r,p_reason:why});load(true)}catch(e){alert(e.message==='reason_required'?'เหตุผลสั้นเกินไป':e.message)}});
+}
+
+if(location.hash==='#in')loginView();else show404();
+</script>
+</body>
+</html>
